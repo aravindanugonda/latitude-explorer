@@ -1,0 +1,30 @@
+{
+  "name": "latitude-explorer",
+  "version": "1.0.0",
+  "description": "A web-based mapping application to explore cities at the same latitude",
+  "main": "index.js",
+  "scripts": {
+    "start": "./start.sh",
+    "stop": "./stop.sh",
+    "dev": "./start.sh",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "db:setup": "cd backend && npm run db:generate && npm run db:push && npm run db:seed",
+    "db:reset": "cd backend && npm run db:reset",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test"
+  },
+  "keywords": [
+    "mapping",
+    "geography",
+    "latitude",
+    "cities",
+    "react",
+    "express",
+    "leaflet"
+  ],
+  "author": "",
+  "license": "MIT"
+}
