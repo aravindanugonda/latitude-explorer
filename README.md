@@ -125,11 +125,7 @@ cd backend && npm run dev     # Backend only
 4. Push to branch: `git push origin feature-name`
 5. Submit a pull request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Map Data**: OpenStreetMap contributors
 - **City Data**: cities.json npm package
