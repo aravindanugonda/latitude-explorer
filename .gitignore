@@ -109,3 +109,4 @@ temp/
 
 # Scripts logs
 *.pid
+.vercel

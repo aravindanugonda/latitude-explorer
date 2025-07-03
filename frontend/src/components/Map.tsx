@@ -34,11 +34,10 @@ const MapEvents = ({
       setSelectedCoordinates(coordinates);
       setClickedLocation(coordinates);
       try {
-  const fetchedCities = await getCitiesByLatitude(lat, lng, 0.1);
+        const fetchedCities = await getCitiesByLatitude(lat, lng, 1.0);
         setCities(fetchedCities || []);
-        // Debug: log the fetched cities
-        // console.log('Fetched cities:', fetchedCities);
       } catch (err: any) {
+        console.error('Error fetching cities:', err);
         setCities([]); // Always update parent
       }
     },

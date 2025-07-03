@@ -4,17 +4,15 @@
   "description": "A web-based mapping application to explore cities at the same latitude",
   "main": "index.js",
   "scripts": {
-    "start": "./start.sh",
-    "stop": "./stop.sh",
-    "dev": "./start.sh",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "build:backend": "cd backend && npm run build",
-    "build:frontend": "cd frontend && npm run build",
-    "build:all": "npm run build:backend && npm run build:frontend",
-    "db:setup": "cd backend && npm run db:generate && npm run db:push && npm run db:seed",
-    "db:reset": "cd backend && npm run db:reset",
-    "test:backend": "cd backend && npm test",
-    "test:frontend": "cd frontend && npm test"
+    "dev": "npm run dev:local",
+    "dev:local": "./start.local.sh",
+    "build": "cd frontend && npm run build",
+    "start": "npm run dev:local",
+    "install:all": "npm install && cd frontend && npm install",
+    "db:setup": "npx prisma generate && npx prisma db push && node importCities.js",
+    "db:seed": "node importCities.js",
+    "db:reset": "npx prisma migrate reset --force",
+    "test": "cd frontend && npm test"
   },
   "keywords": [
     "mapping",
@@ -22,9 +20,20 @@
     "latitude",
     "cities",
     "react",
-    "express",
+    "vercel",
+    "serverless",
     "leaflet"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "prisma": "^6.11.0"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.9",
+    "@prisma/client": "^6.11.0",
+    "better-sqlite3": "^12.2.0",
+    "csv-parser": "^3.2.0"
+  }
 }

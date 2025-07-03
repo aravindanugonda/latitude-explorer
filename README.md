@@ -35,19 +35,13 @@ npm run db:setup
 
 ### 3. Start Application
 ```bash
-# Linux/Mac
-./start.sh
-
-# Windows
-start.bat
-
-# Or using npm
-npm start
+# Start development servers
+npm run dev
 ```
 
 ### 4. Open in Browser
+- API: `http://localhost:3000`
 - Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3001`
 
 ## 🛠️ Tech Stack
 
@@ -62,19 +56,19 @@ npm start
 
 ```
 latitude-explorer/
-├── 📁 frontend/          # React + TypeScript frontend
-├── 📁 backend/           # Node.js + Express API
+├── 📁 api/               # Vercel serverless functions
+├── 📁 frontend/          # React + TypeScript frontend  
 ├── 📁 docs/              # Documentation
-├── 🚀 start.sh           # Development scripts
-├── 🛑 stop.sh            
+├── � prisma/            # Database schema and local db
+├── 📄 importCities.js    # Database seeding script
+├── � start.local.sh     # Local development script
 └── 📄 README.md          # This file
 ```
 
 ## 🌐 API Endpoints
 
-- `GET /api/cities/by-latitude/:lat` - Find cities by latitude
-- `GET /api/cities/search?q=term` - Search cities by name/country
-- `GET /api/cities/:id` - Get specific city details
+- `GET /api/cities?latitude=40.7128&tolerance=0.5` - Find cities by latitude
+- `GET /api/cities?latitude=0&tolerance=1` - Get cities near equator
 
 ## 📚 Documentation
 

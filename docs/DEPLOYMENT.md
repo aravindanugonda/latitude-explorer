@@ -1,82 +1,193 @@
 # Deployment Guide
 
-This guide covers deploying the Latitude Explorer application to various platforms.
+This guide covers deploying the Latitude Explorer application to production using Vercel with Turso database.
 
-## 🚀 Deployment Options
+## 🚀 Primary Deployment Method: Vercel + Turso
 
-### Option 1: Vercel (Frontend) + Railway (Backend)
+This is the recommended production setup using serverless functions and cloud database.
 
-#### Frontend to Vercel
+### Prerequisites
+- Vercel account
+- Turso account and database setup
+- Node.js 18+
+
+### 1. Turso Database Setup
+
+```bash
+# Install Turso CLI
+curl -sSfL https://get.tur.so/install.sh | bash
+
+# Create database
+turso db create latitude-explorer
+
+# Get database URL and auth token
+turso db show latitude-explorer
+turso db tokens create latitude-explorer
+```
+
+### 2. Vercel Deployment
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
 
-# From frontend directory
-cd frontend
+# From project root
 vercel
 
-# Follow prompts to deploy
+# Follow prompts:
+# - Link to existing project or create new
+# - Choose "yes" for settings
+# - Framework preset: Other
+# - Build command: npm run build
+# - Output directory: frontend/dist
 ```
 
-#### Backend to Railway
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
+### 3. Environment Variables
 
-# From backend directory  
+Set these in Vercel dashboard (Settings → Environment Variables):
+
+```bash
+TURSO_DATABASE_URL=libsql://your-database-url.turso.io
+TURSO_AUTH_TOKEN=your-auth-token
+NODE_ENV=production
+```
+
+### 4. Database Migration
+
+```bash
+# Seed your production database
+npm run db:seed:turso
+```
+
+### 5. Verify Deployment
+
+- Frontend: `https://your-app.vercel.app`
+- API: `https://your-app.vercel.app/api/cities?latitude=40.7128`
+
+## 🏗️ Architecture Overview
+
+### Hybrid Local/Production Setup
+
+**Local Development:**
+- Frontend: Vite dev server (localhost:5173)
+- Backend: Express server (localhost:3000) 
+- Database: SQLite with Prisma ORM
+- API Proxy: Vite proxy routes /api/* to localhost:3000
+
+**Production:**
+- Frontend: Vercel static hosting
+- Backend: Vercel serverless functions (/api/*)
+- Database: Turso (libSQL) cloud database
+- Smart Routing: Environment-based database client selection
+
+### Smart Database Routing
+
+The `/api/cities.js` function automatically detects environment:
+
+```javascript
+// Local: Uses Prisma with SQLite
+if (process.env.NODE_ENV === 'development') {
+  return require('./cities.prisma.js');
+}
+
+// Production: Uses libSQL client with Turso
+return require('./cities.turso.js');
+```
+
+## 🔄 Development Workflow
+
+### Local Development
+```bash
+# Start local development with SQLite
+npm run dev:local
+
+# This starts:
+# - Frontend: http://localhost:5173
+# - Backend: http://localhost:3000 (Express)
+# - Database: SQLite (./backend/prisma/dev.db)
+```
+
+### Production Testing
+```bash
+# Test production build locally
+npm run build
+npm start
+
+# Verify API endpoints work
+curl http://localhost:5173/api/cities?latitude=40.7128
+```
+
+## 🌐 Alternative Deployment Options
+
+### Option 1: Railway (Backend) + Vercel (Frontend)
+
+For traditional backend deployment:
+
+```bash
+# Backend to Railway
+npm install -g @railway/cli
 cd backend
 railway login
 railway init
 railway up
+
+# Frontend to Vercel (as above)
+cd ../frontend
+vercel
 ```
 
 ### Option 2: Docker Deployment
 
-#### Create Dockerfiles
+**Complete Docker Setup:**
 
-**Frontend Dockerfile:**
 ```dockerfile
+# Dockerfile.frontend
 FROM node:18-alpine AS build
 WORKDIR /app
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
-COPY . .
+COPY frontend/ .
 RUN npm run build
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-**Backend Dockerfile:**
 ```dockerfile
+# Dockerfile.backend
 FROM node:18-alpine
 WORKDIR /app
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm ci --only=production
-COPY . .
+COPY backend/ .
 RUN npm run build
 RUN npx prisma generate
-EXPOSE 3001
+EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-**Docker Compose:**
 ```yaml
+# docker-compose.yml
 version: '3.8'
 services:
   backend:
-    build: ./backend
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      - DATABASE_URL=file:./prisma/dev.db
+      - DATABASE_URL=file:./prisma/prod.db
     volumes:
       - ./backend/prisma:/app/prisma
   
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
     ports:
       - "80:80"
     depends_on:
@@ -85,15 +196,12 @@ services:
 
 ### Option 3: Traditional VPS
 
-#### Requirements
-- Ubuntu 20.04+ or similar
-- Node.js 18+
-- Nginx (for frontend)
-- PM2 (for process management)
-
-#### Setup Script
+**Ubuntu Setup Script:**
 ```bash
-# Install dependencies
+#!/bin/bash
+# install-latitude-explorer.sh
+
+# Install Node.js 18
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs nginx
 
@@ -101,93 +209,122 @@ sudo apt-get install -y nodejs nginx
 sudo npm install -g pm2
 
 # Clone and setup
-git clone <your-repo>
+git clone https://github.com/your-username/latitude-explorer.git
 cd latitude-explorer
 
-# Backend setup
-cd backend
+# Install dependencies
 npm install
-npm run build
-npm run db:setup
+cd backend && npm install && npm run build
+cd ../frontend && npm install && npm run build
 
-# Start with PM2
+# Setup database
+cd ../backend && npm run db:setup
+
+# Start backend with PM2
 pm2 start npm --name "lat-backend" -- start
 pm2 save
 pm2 startup
 
-# Frontend setup
-cd ../frontend
-npm install
-npm run build
-
-# Copy build to nginx
-sudo cp -r dist/* /var/www/html/
+# Configure nginx for frontend
+sudo cp frontend/dist/* /var/www/html/
+sudo systemctl restart nginx
 ```
 
 ## 🔧 Environment Configuration
 
-### Production Environment Variables
-
-**Backend (.env):**
+### Development (.env.local)
 ```bash
+DATABASE_URL="file:./backend/prisma/dev.db"
+NODE_ENV=development
+PORT=3000
+```
+
+### Production (Vercel Environment Variables)
+```bash
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-token-here
 NODE_ENV=production
-PORT=3001
-DATABASE_URL="file:./prisma/prod.db"
 ```
 
-**Frontend (.env.production):**
+## 📊 Performance Optimizations
+
+### Database Optimizations
+- **Connection Pooling**: Turso handles automatically
+- **Query Optimization**: Indexed latitude searches
+- **Result Caching**: Browser and CDN caching
+
+### Frontend Optimizations
+- **Static Generation**: Pre-built assets on Vercel CDN
+- **Code Splitting**: Automatic with Vite
+- **Image Optimization**: Map tile caching
+- **Gzip Compression**: Enabled by default on Vercel
+
+### API Optimizations
+- **Serverless Functions**: Auto-scaling and cold start optimization
+- **Response Caching**: CDN-level caching for static responses
+- **Query Efficiency**: Optimized latitude range queries
+
+## 🔒 Security Configuration
+
+### Vercel Security Headers
+
+Add to `vercel.json`:
+```json
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### CORS Configuration
+Production CORS is configured for your domain in `/api/cities.js`.
+
+## 📈 Monitoring & Analytics
+
+### Vercel Analytics
+Enable in Vercel dashboard for:
+- Page views and performance
+- Function execution metrics
+- Error tracking
+
+### Turso Monitoring
+Built-in metrics for:
+- Query performance
+- Database usage
+- Connection stats
+
+### Custom Health Checks
 ```bash
-VITE_API_URL=https://your-backend-domain.com/api
-```
+# Test API health
+curl https://your-app.vercel.app/api/cities?latitude=0&tolerance=1
 
-## 📊 Performance Considerations
-
-### Database Optimization
-- Use PostgreSQL for production instead of SQLite
-- Add database connection pooling
-- Implement Redis caching for frequent queries
-
-### Frontend Optimization
-- Enable gzip compression
-- Configure CDN for static assets
-- Implement service worker for caching
-
-### Backend Optimization
-- Add rate limiting
-- Implement API response caching
-- Use compression middleware
-
-## 🔒 Security Checklist
-
-- [ ] HTTPS enabled on both frontend and backend
-- [ ] Environment variables secured
-- [ ] CORS properly configured for production domains
-- [ ] API rate limiting implemented
-- [ ] Database connection secured
-- [ ] Security headers configured
-- [ ] Input validation on all endpoints
-
-## 📈 Monitoring
-
-### Recommended Tools
-- **Application Monitoring**: New Relic, DataDog
-- **Error Tracking**: Sentry
-- **Uptime Monitoring**: Pingdom, UptimeRobot
-- **Log Aggregation**: LogDNA, Papertrail
-
-### Health Check Endpoints
-Add to backend:
-```typescript
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+# Expected response: Array of cities near equator
 ```
 
 ## 🔄 CI/CD Pipeline
 
-### GitHub Actions Example
+### GitHub Actions for Vercel
+
 ```yaml
-name: Deploy
+# .github/workflows/deploy.yml
+name: Deploy to Vercel
 on:
   push:
     branches: [main]
@@ -196,48 +333,90 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
       
-      # Backend tests and deploy
-      - name: Backend Tests
-        run: cd backend && npm ci && npm test
+      - name: Install dependencies
+        run: npm ci
       
-      # Frontend build and deploy
-      - name: Frontend Build
-        run: cd frontend && npm ci && npm run build
+      - name: Run tests
+        run: npm test
       
-      # Deploy to your platform
-      - name: Deploy
-        run: # Your deployment commands
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
 ```
 
-## 🌐 Domain Configuration
+## 🌐 Custom Domain Setup
 
-### Custom Domain Setup
-1. Purchase domain from registrar
+### DNS Configuration
+1. Add custom domain in Vercel dashboard
 2. Configure DNS records:
-   - A record: @ -> Your server IP
-   - CNAME: www -> your-domain.com
-   - CNAME: api -> your-backend-domain.com
+   ```
+   Type: CNAME
+   Name: @
+   Value: cname.vercel-dns.com
+   ```
 
 ### SSL Certificate
-```bash
-# Using Certbot for free SSL
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
-```
+- Automatic SSL via Vercel
+- HTTP to HTTPS redirect enabled by default
 
 ## 📝 Post-Deployment Checklist
 
-- [ ] Application loads correctly
-- [ ] Map functionality works
-- [ ] City search returns results
-- [ ] All API endpoints respond
+- [ ] Application loads at production URL
+- [ ] Map renders correctly and is interactive
+- [ ] City search returns accurate results
+- [ ] API endpoints respond with expected data
 - [ ] Mobile responsiveness verified
-- [ ] Performance metrics acceptable
+- [ ] Performance metrics acceptable (< 2s load time)
 - [ ] Error tracking configured
-- [ ] Backup strategy implemented
-- [ ] Monitoring alerts set up
+- [ ] Environment variables secured
+- [ ] Database connection stable
+- [ ] Monitoring alerts configured
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**API 404 Errors:**
+- Verify `/api/` folder is in project root
+- Check Vercel function deployment logs
+
+**Database Connection Issues:**
+- Verify TURSO_DATABASE_URL and TURSO_AUTH_TOKEN
+- Test connection with Turso CLI: `turso db shell latitude-explorer`
+
+**Build Failures:**
+- Check Node.js version compatibility
+- Verify all dependencies installed
+- Review Vercel build logs
+
+**Performance Issues:**
+- Monitor function execution time in Vercel dashboard
+- Check database query performance in Turso
+- Optimize frontend bundle size
+
+### Debug Commands
+```bash
+# Local API test
+curl http://localhost:3000/api/cities?latitude=40.7128
+
+# Production API test  
+curl https://your-app.vercel.app/api/cities?latitude=40.7128
+
+# Database connectivity test
+turso db shell latitude-explorer "SELECT COUNT(*) FROM cities;"
+```
+
+---
+
+**Ready for production deployment! 🚀**

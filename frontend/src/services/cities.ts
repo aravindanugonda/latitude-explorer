@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = '/api';
 
 export interface City {
   id: number;
@@ -21,11 +21,10 @@ export interface CitiesResponse {
   query?: string;
 }
 
-export const getCitiesByLatitude = async (latitude: number, longitude: number, tolerance: number = 0.1): Promise<City[]> => {
+export const getCitiesByLatitude = async (latitude: number, longitude: number, tolerance: number = 1.0): Promise<City[]> => {
   try {
-    const response = await axios.get<CitiesResponse>(
-      `${API_URL}/cities/by-latitude/${latitude}?lng=${longitude}&tolerance=${tolerance}&limit=50`
-    );
+    const url = `${API_URL}/cities?lat=${latitude}&lng=${longitude}&tolerance=${tolerance}&limit=50`;
+    const response = await axios.get<CitiesResponse>(url);
     return response.data.cities;
   } catch (error) {
     console.error('Error fetching cities by latitude:', error);
