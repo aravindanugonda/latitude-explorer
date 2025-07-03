@@ -50,10 +50,11 @@ const Map = ({ setSelectedCoordinates, setCities }: MapProps) => {
   const [clickedLocation, setClickedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   return (
-  <div className="h-full w-full relative border border-blue-100 shadow-md rounded-lg overflow-hidden cursor-pointer">
+  <div className="h-full w-full relative overflow-hidden cursor-pointer">
       <MapContainer
-        center={[20, 0]}
-        zoom={2}
+        key="london-map" // Force re-render
+        center={[51.5074, -0.1278]} // London coordinates
+        zoom={8} // Zoomed out to show more area around London
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%', cursor: 'pointer' }}
         className="z-0"

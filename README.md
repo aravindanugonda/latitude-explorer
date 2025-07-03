@@ -1,25 +1,30 @@
 # 🌍 Latitude Explorer
 
-A web-based mapping application that allows users to click on any location to view coordinates and discover cities at the same latitude worldwide.
+A modern, responsive web-based mapping application that allows users to click on any location to view coordinates and discover cities at the same latitude worldwide.
 
 ![Latitude Explorer Demo](https://img.shields.io/badge/status-ready-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white)
 
 ## ✨ Features
 
-- **🗺️ Interactive World Map**: Click anywhere to explore coordinates
+- **🗺️ Interactive World Map**: High-quality map centered on London with smooth navigation
 - **🌍 Global City Discovery**: Find all cities at the same latitude (154,694+ cities)
-- **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **⚡ Real-time Results**: Fast latitude-based city queries
+- **📱 Cross-Browser Compatible**: Consistent experience across Chrome, Firefox, Safari, and Edge
+- **⚡ Real-time Results**: Fast latitude-based city queries with loading indicators
 - **📋 Copy Coordinates**: Easy coordinate sharing functionality
-- **🎨 Modern UI**: Beautiful interface with Tailwind CSS
+- **🎨 Modern UI**: Beautiful interface with enhanced typography and spacing
+- **📊 Data Table**: Clean, readable table with city details, population, and distance calculations
+- **🖱️ Custom Scrollbars**: Styled scrollbars for consistent appearance across browsers
+- **📐 Optimized Layout**: 70/30 split between map and data panel for optimal viewing
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
+- Vercel CLI: `npm i -g vercel`
 
 ### 1. Clone and Install
 ```bash
@@ -35,13 +40,13 @@ npm run db:setup
 
 ### 3. Start Application
 ```bash
-# Start development servers
-npm run dev
+# Start with Vercel development server
+vercel dev
 ```
 
 ### 4. Open in Browser
-- API: `http://localhost:3000`
-- Frontend: `http://localhost:5173`
+- Application: `http://localhost:3000`
+- Both frontend and API are served from the same port
 
 ## 🛠️ Tech Stack
 
@@ -50,7 +55,30 @@ npm run dev
 | **Frontend** | React 19, TypeScript, Tailwind CSS, Leaflet.js |
 | **Backend** | Node.js, Express.js, TypeScript |
 | **Database** | SQLite + Prisma ORM |
-| **Development** | Vite, ESLint, Hot Reload |
+| **Development** | Vercel CLI, Vite, ESLint, Hot Reload |
+| **Deployment** | Vercel serverless functions |
+| **UI/UX** | Custom CSS, Cross-browser styling, Responsive design |
+
+## 🎨 UI/UX Improvements
+
+### Enhanced Right Panel (30% width)
+- **Professional Header**: Gradient blue header with "Location Details"
+- **Improved Typography**: Readable font sizes (14px+) instead of tiny text
+- **Better Spacing**: Proper padding and margins for clarity
+- **Loading States**: Smooth loading indicators during data fetch
+- **Clean Tables**: Well-structured city data with hover effects
+
+### Optimized Map Area (70% width)
+- **Larger Map View**: More space for exploration and navigation
+- **London-Centered**: Initial view focused on London area (zoom level 8)
+- **No Grey Borders**: Clean map display without visual artifacts
+- **Stable Layout**: Fixed viewport widths prevent layout shifting
+
+### Cross-Browser Consistency
+- **Custom Scrollbars**: Styled for webkit and Firefox browsers
+- **CSS Reset**: Proper box-sizing and overflow management
+- **Font Rendering**: Consistent typography across all browsers
+- **Layout Stability**: No unwanted scrollbars or spacing issues
 
 ## 📁 Project Structure
 
@@ -59,9 +87,8 @@ latitude-explorer/
 ├── 📁 api/               # Vercel serverless functions
 ├── 📁 frontend/          # React + TypeScript frontend  
 ├── 📁 docs/              # Documentation
-├── � prisma/            # Database schema and local db
+├── 📁 prisma/            # Database schema and local db
 ├── 📄 importCities.js    # Database seeding script
-├── � start.local.sh     # Local development script
 └── 📄 README.md          # This file
 ```
 
@@ -69,13 +96,6 @@ latitude-explorer/
 
 - `GET /api/cities?latitude=40.7128&tolerance=0.5` - Find cities by latitude
 - `GET /api/cities?latitude=0&tolerance=1` - Get cities near equator
-
-## 📚 Documentation
-
-- **[Frontend README](frontend/README.md)** - React app details
-- **[Backend README](backend/README.md)** - API and database info
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment
-- **[Changelog](docs/CHANGELOG.md)** - Version history
 
 ## 🔧 Development Scripts
 
@@ -88,12 +108,12 @@ npm run db:setup        # Setup database with seed data
 npm run db:reset        # Reset database
 
 # Development
-npm start               # Start both frontend and backend
+vercel dev              # Start with Vercel (recommended)
+npm start               # Alternative: Start both frontend and backend
 npm stop                # Stop all processes
 
-# Individual services
-cd frontend && npm run dev    # Frontend only
-cd backend && npm run dev     # Backend only
+# Building
+npm run build:all       # Build both frontend and backend
 ```
 
 ## 🎯 How It Works
@@ -111,88 +131,12 @@ cd backend && npm run dev     # Backend only
 - **Research**: Study urban distribution patterns
 - **Fun Exploration**: Learn about global city locations
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -m 'Add feature'`
-4. Push to branch: `git push origin feature-name`
-5. Submit a pull request
-
-##  Acknowledgments
-
-- **Map Data**: OpenStreetMap contributors
-- **City Data**: cities.json npm package
-- **Maps**: Leaflet.js library
-- **Icons**: Font Awesome / Heroicons
-
----
-
-**⭐ Star this repository if you found it helpful!**
-   start.bat
-   ```
-
-4. **Stop the application:**
-   ```bash
-   # Linux/Mac
-   ./stop.sh
-   # or
-   npm stop
-
-   # Windows
-   stop.bat
-   ```
-
-## 🎯 How to Use
-
-1. Open your browser to `http://localhost:5173`
-2. Click anywhere on the world map
-3. View the selected coordinates in the sidebar
-4. Explore cities at the same latitude!
-
-## 🛠️ Development
-
-### Available Scripts
-
-**Root level:**
-- `npm start` - Start both frontend and backend
-- `npm stop` - Stop all services
-- `npm run install:all` - Install dependencies for all projects
-- `npm run build:all` - Build both frontend and backend
-- `npm run db:setup` - Setup and seed database
-
-**Backend (cd backend):**
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build TypeScript
-- `npm run db:seed` - Re-seed database
-
-**Frontend (cd frontend):**
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-
-## 🏗️ Tech Stack
-
-- **Frontend:** React + TypeScript + Leaflet + Tailwind CSS
-- **Backend:** Express + TypeScript + Prisma
-- **Database:** SQLite
-- **Maps:** OpenStreetMap + Leaflet
-
-## 📱 Features
-
-- Interactive world map
-- Real-time coordinate display
-- City discovery by latitude
-- Population data
-- Copy coordinates to clipboard
-- Responsive design
-- Fast search (< 500ms)
-
 ## 🔧 Troubleshooting
 
 ### Port conflicts
-If you see port errors, run the stop script first:
+If you see port errors, stop any running processes:
 ```bash
-./stop.sh  # or stop.bat on Windows
+npm stop
 ```
 
 ### Database issues
@@ -208,10 +152,23 @@ Reinstall all dependencies:
 npm run install:all
 ```
 
-## 📊 API Endpoints
+## 🤝 Contributing
 
-- `GET /api/cities/by-latitude/:lat?tolerance=0.1&limit=50`
-- `GET /api/cities/search?q=cityname`
-- `GET /api/cities/:id`
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -m 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a pull request
+
+## 📚 Acknowledgments
+
+- **Map Data**: OpenStreetMap contributors
+- **City Data**: cities.json npm package
+- **Maps**: Leaflet.js library
+- **Icons**: Font Awesome / Heroicons
+
+---
+
+**⭐ Star this repository if you found it helpful!**
 
 Enjoy exploring the world! 🌎
