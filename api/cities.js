@@ -1,55 +1,30 @@
-import { PrismaClient } from '@prisma/client';
+// Smart router that detects environment and routes to appropriate handler
+export default async function handler(req, res) {
+  try {
+    const isProd = process.env.NODE_ENV === 'production' || process.env.TURSO_DATABASE_URL;
+    
+    console.log('Environment detection:', {
+      NODE_ENV: process.env.NODE_ENV,
+      hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
+      isProd
+    });
 
-const prisma = new PrismaClient();
-
-const isProd = process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.includes('turso');
-
-let handler;
-if (isProd) {
-  handler = require('./cities.turso').default;
-} else {
-  handler = async function(req, res) {
-    if (req.method !== 'GET') {
-      return res.status(405).json({ error: 'Method not allowed' });
+    if (isProd) {
+      // Use Turso for production
+      console.log('Routing to Turso handler');
+      const { default: tursoHandler } = await import('./cities.turso.js');
+      return tursoHandler(req, res);
+    } else {
+      // Use Prisma for local development
+      console.log('Routing to Prisma handler');
+      const { default: prismaHandler } = await import('./cities.prisma.js');
+      return prismaHandler(req, res);
     }
-    try {
-      const { lat, lng, tolerance = 1.0, limit = 50 } = req.query;
-      const latitude = parseFloat(lat);
-      const longitude = parseFloat(lng);
-      const tol = parseFloat(tolerance);
-      const lim = parseInt(limit);
-      if (isNaN(latitude) || isNaN(longitude)) {
-        return res.status(400).json({ error: 'Invalid latitude or longitude' });
-      }
-      const cities = await prisma.city.findMany({
-        where: {
-          latitude: {
-            gte: latitude - tol,
-            lte: latitude + tol,
-          },
-          population: {
-            gte: 100_000,
-          },
-        },
-        orderBy: [
-          { population: 'desc' },
-          { name: 'asc' }
-        ],
-        take: 500,
-      });
-      const filteredCities = cities.filter(city => Math.abs(city.longitude - longitude) >= 3);
-      res.status(200).json({
-        cities: filteredCities.slice(0, lim),
-        total: filteredCities.length,
-        latitude,
-        longitude,
-        tolerance: tol,
-      });
-    } catch (error) {
-      console.error('Error fetching cities:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  };
+  } catch (error) {
+    console.error('Router error:', error);
+    res.status(500).json({ 
+      error: 'Router error', 
+      details: error.message 
+    });
+  }
 }
-
-export default handler;
