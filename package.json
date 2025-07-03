@@ -4,10 +4,7 @@
   "description": "A web-based mapping application to explore cities at the same latitude",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run dev:local",
-    "dev:local": "./start.local.sh",
-    "build": "npm run install:all && cd frontend && npm run build",
-    "start": "npm run dev:local",
+  "build": "npm run install:all && cd frontend && npm run build",
     "install:all": "npm install && cd frontend && npm install",
     "db:setup": "npx prisma generate && npx prisma db push && node importCities.js",
     "db:seed": "node importCities.js",
