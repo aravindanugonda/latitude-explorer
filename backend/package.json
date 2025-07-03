@@ -22,6 +22,7 @@
     "all-the-cities": "^3.1.0",
     "cities.json": "^1.1.50",
     "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",

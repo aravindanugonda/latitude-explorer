@@ -34,7 +34,7 @@ const MapEvents = ({
       setSelectedCoordinates(coordinates);
       setClickedLocation(coordinates);
       try {
-        const fetchedCities = await getCitiesByLatitude(lat, 0.1);
+  const fetchedCities = await getCitiesByLatitude(lat, lng, 0.1);
         setCities(fetchedCities || []);
         // Debug: log the fetched cities
         // console.log('Fetched cities:', fetchedCities);
@@ -58,10 +58,13 @@ const Map = ({ setSelectedCoordinates, setCities }: MapProps) => {
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%', cursor: 'pointer' }}
         className="z-0"
+        maxBounds={[[ -85, -180 ], [ 85, 180 ]]}
+        maxBoundsViscosity={1.0}
       >
         <TileLayer
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          noWrap={true}
         />
         <MapEvents
           setSelectedCoordinates={setSelectedCoordinates}

@@ -21,9 +21,11 @@ export interface CitiesResponse {
   query?: string;
 }
 
-export const getCitiesByLatitude = async (latitude: number, tolerance: number = 0.1): Promise<City[]> => {
+export const getCitiesByLatitude = async (latitude: number, longitude: number, tolerance: number = 0.1): Promise<City[]> => {
   try {
-    const response = await axios.get<CitiesResponse>(`${API_URL}/cities/by-latitude/${latitude}?tolerance=${tolerance}&limit=50`);
+    const response = await axios.get<CitiesResponse>(
+      `${API_URL}/cities/by-latitude/${latitude}?lng=${longitude}&tolerance=${tolerance}&limit=50`
+    );
     return response.data.cities;
   } catch (error) {
     console.error('Error fetching cities by latitude:', error);
