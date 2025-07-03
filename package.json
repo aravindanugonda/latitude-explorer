@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm run dev:local",
     "dev:local": "./start.local.sh",
-    "build": "cd frontend && npm run build",
+    "build": "npm run install:all && cd frontend && npm run build",
     "start": "npm run dev:local",
     "install:all": "npm install && cd frontend && npm install",
     "db:setup": "npx prisma generate && npx prisma db push && node importCities.js",
@@ -28,7 +28,8 @@
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^9.2.0",
-    "prisma": "^6.11.0"
+    "prisma": "^6.11.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@libsql/client": "^0.15.9",
