@@ -99,8 +99,8 @@ function App() {
                         <tbody className="divide-y divide-gray-100">
                           {cities.map((city, idx) => (
                             <tr key={city.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                              <td className="px-3 py-2 font-medium text-gray-900">
-                                <div className="truncate max-w-[120px]" title={city.name}>
+                              <td className="px-3 py-2 font-medium text-gray-900 font-roboto">
+                                <div className="truncate max-w-[120px] font-roboto" title={city.name}>
                                   {city.name}
                                 </div>
                               </td>
