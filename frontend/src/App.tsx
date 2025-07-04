@@ -38,7 +38,7 @@ function App() {
       </div>
 
       {/* Right Panel - Compact at 30% */}
-      <div className="w-[30vw] h-full flex flex-col bg-white/95 backdrop-blur-sm border-l border-gray-200 shadow-xl">
+  <div className="w-[30vw] h-full flex flex-col bg-white/95 backdrop-blur-sm border-l border-gray-200 shadow-xl font-sfpro">
         {/* Header */}
         <div className="shrink-0 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
           <h2 className="text-lg font-semibold">Location Details</h2>
@@ -54,13 +54,13 @@ function App() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Latitude:</span>
-                    <span className="font-mono text-sm text-blue-700 font-medium">
+                    <span className="text-sm text-blue-700 font-medium">
                       {selectedCoordinates.latitude.toFixed(6)}°
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Longitude:</span>
-                    <span className="font-mono text-sm text-blue-700 font-medium">
+                    <span className="text-sm text-blue-700 font-medium">
                       {selectedCoordinates.longitude.toFixed(6)}°
                     </span>
                   </div>
@@ -99,8 +99,8 @@ function App() {
                         <tbody className="divide-y divide-gray-100">
                           {cities.map((city, idx) => (
                             <tr key={city.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                              <td className="px-3 py-2 font-medium text-gray-900 font-roboto">
-                                <div className="truncate max-w-[120px] font-roboto" title={city.name}>
+                              <td className="px-3 py-2 font-medium text-gray-900 font-sfpro">
+                                <div className="truncate max-w-[120px] font-sfpro" title={city.name}>
                                   {city.name}
                                 </div>
                               </td>
@@ -109,10 +109,10 @@ function App() {
                                   {city.country}
                                 </div>
                               </td>
-                              <td className="px-3 py-2 font-mono text-gray-700 text-xs">
+                              <td className="px-3 py-2 text-gray-700 text-xs">
                                 {city.population?.toLocaleString() ?? 'N/A'}
                               </td>
-                              <td className="px-3 py-2 font-mono text-gray-600 text-xs">
+                              <td className="px-3 py-2 text-gray-600 text-xs">
                                 {Math.abs(city.latitude - selectedCoordinates.latitude).toFixed(2)}°
                               </td>
                             </tr>

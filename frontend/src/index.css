@@ -18,8 +18,8 @@ html, body {
 }
 
 /* Roboto font utility */
-.font-roboto {
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+.font-sfpro {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', Roboto, Arial, Helvetica, sans-serif;
 }
 
 #root {
