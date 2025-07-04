@@ -68,11 +68,10 @@ npm run db:seed:turso
 
 ### Hybrid Local/Production Setup
 
+
 **Local Development:**
-- Frontend: Vite dev server (localhost:5173)
-- Backend: Express server (localhost:3000) 
+- App & API: Vercel dev server (http://localhost:3000)
 - Database: SQLite with Prisma ORM
-- API Proxy: Vite proxy routes /api/* to localhost:3000
 
 **Production:**
 - Frontend: Vercel static hosting
@@ -96,15 +95,13 @@ return require('./cities.turso.js');
 
 ## 🔄 Development Workflow
 
+
 ### Local Development
 ```bash
-# Start local development with SQLite
-npm run dev:local
-
-# This starts:
-# - Frontend: http://localhost:5173
-# - Backend: http://localhost:3000 (Express)
-# - Database: SQLite (./backend/prisma/dev.db)
+# Start local development (App & API on port 3000)
+vercel dev
+# Open http://localhost:3000
+# Database: SQLite (./backend/prisma/dev.db)
 ```
 
 ### Production Testing
@@ -114,7 +111,7 @@ npm run build
 npm start
 
 # Verify API endpoints work
-curl http://localhost:5173/api/cities?latitude=40.7128
+curl http://localhost:3000/api/cities?latitude=40.7128
 ```
 
 ## 🌐 Alternative Deployment Options

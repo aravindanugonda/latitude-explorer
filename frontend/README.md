@@ -12,13 +12,14 @@ React frontend for the Latitude Explorer mapping application.
 
 ## 🚀 Development
 
+
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
-# → http://localhost:5173
+# Start local development (App & API on port 3000)
+vercel dev
+# Open http://localhost:3000
 
 # Build for production
 npm run build
@@ -36,12 +37,10 @@ src/
 └── main.tsx            # Entry point
 ```
 
+
 ## 🌐 Environment
 
-Create `.env.local` for custom API URL:
-```bash
-VITE_API_URL=http://localhost:3001/api
-```
+No custom API URL is needed for local development. Both the frontend and API run on http://localhost:3000 via `vercel dev`.
 
 ## � Features
 
